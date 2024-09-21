@@ -20,28 +20,19 @@ def train_svm(data, target, gamma=0.001):
     accuracy = metrics.accuracy_score(y_test, y_pred)
     return clf, X_test, y_test, y_pred, accuracy
 
-def eda_page(images, target):
-    st.title("Images du dataset digits de sklearn")
-    st.write("Utilisez le slider ci-dessous pour naviguer parmi les images du dataset.")
-
-    # Créer un slider pour sélectionner l'indice de l'image (de 0 à 9)
-    index = st.slider("Sélectionnez l'image à afficher", 0, len(images) - 1, 0)
-
-    # Afficher l'image et le label correspondant
-    fig, ax = plt.subplots(figsize=(2, 2))  
-    ax.imshow(images[index], cmap=plt.cm.gray_r, interpolation="nearest")
-    ax.set_title(f"Label: {target[index]}")
-    ax.set_axis_off() 
-
-    st.pyplot(fig)
-
 # Page de prédiction
 def prediction_page(clf, X_test, y_test, y_pred):
-    st.title("Prédictions avec le modèle SVM")
-    st.write(f"Précision du modèle: {clf.score(X_test, y_test):.2%}")
+    st.title("Predictions with SVM Classifier")
+    st.write("""
+**Support Vector Machine (SVM)** is a supervised learning algorithm used for classification and regression tasks. It works by finding the hyperplane that best separates different classes in the feature space, maximizing the margin between them.
+
+SVM is particularly effective with the digits dataset because it handles high-dimensional data well and is robust against overfitting, especially when the number of features exceeds the number of samples. The digits dataset consists of 8x8 pixel images of handwritten digits, which translates to a high-dimensional feature space. SVM's ability to create non-linear decision boundaries through kernel functions allows it to capture the complexities of handwritten digit recognition, leading to high accuracy in classification tasks.
+""")
+
+    st.write(f"**Precision of the model**: {clf.score(X_test, y_test):.2%}")
 
     # Affichage des premières prédictions
-    st.write("Voici les prédictions pour quelques images test:")
+    st.write("Here are the predictions for a few test images:")
     fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
     for ax, image, prediction in zip(axes, X_test, y_pred):
         ax.set_axis_off()
@@ -52,32 +43,30 @@ def prediction_page(clf, X_test, y_test, y_pred):
     st.pyplot(fig)
 
     # Afficher le rapport de classification sous forme de DataFrame
-    st.write("Rapport de classification:")
+    st.write("**Classification report:**")
     report = metrics.classification_report(y_test, y_pred, output_dict=True)
     report_df = pd.DataFrame(report).transpose()
     st.dataframe(report_df)
 
     # Matrice de confusion
-    st.write("Matrice de confusion:")
+    st.write("**Confusion matrix:**")
     disp = metrics.ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
     fig, ax = plt.subplots()
     disp.plot(ax=ax)
     st.pyplot(fig)
 
+    st.markdown("""
+    We can see from this confusion matrix that the model performs very well for all digits (over 85 correct predictions out of a total of 90 images) except for the label 3, which is sometimes incorrectly predicted as 5, 7, or 8.
+    """)
+
 # Main app
 def main():
-    st.sidebar.title("Navigation")
-    page = st.sidebar.selectbox("Choisissez une page", ["EDA", "Prédictions"])
 
     # Charger les données
     data, target, images = load_data()
 
-    # Choisir la page
-    if page == "EDA":
-        eda_page(images[:10], target[:10])
-    elif page == "Prédictions":
-        clf, X_test, y_test, y_pred, accuracy = train_svm(data, target)
-        prediction_page(clf, X_test, y_test, y_pred)
+    clf, X_test, y_test, y_pred, accuracy = train_svm(data, target)
+    prediction_page(clf, X_test, y_test, y_pred)
 
 if __name__ == "__main__":
     main()
