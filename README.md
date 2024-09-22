@@ -44,7 +44,7 @@ To run the Streamlit app using Docker, follow these steps:
 2. **Run the Docker container**  
    After the image is pulled, use the following command to start the container and run the Streamlit app     on port **8501**:
    ```bash
-   docker run -p 8501:8501 benjamincerf/streamlit-app
+   docker run -dp 0.0.0.0:8501:8501 benjamincerf/streamlit-app
 3. **Access the Streamlit app**  
    Open your browser and go to http://localhost:8501. You should see the Streamlit interface of the app,     where you can explore the digits dataset and see predictions.
 
